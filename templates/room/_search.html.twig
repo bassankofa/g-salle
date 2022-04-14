@@ -1,0 +1,24 @@
+<form class="mt-3" action="">
+    <div class="form-group">
+        <label for="roomCapacitySelect">Capacité</label>
+        <select class="custom-select" id="roomCapacitySelect">
+            <option selected disabled>Sélectionnez</option>
+            <option value='{"min":1,"max":5}'>Moins de 5 personnes</option>
+            <option value='{"min":6,"max":10}'>Entre 6 et 10 personnes</option>
+            <option value='{"min":11,"max":20}'>Entre 11 et 20 personnes</option>
+            <option value='{"min":21}'>Plus de 20 personnes</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="featuresList">Options</label>
+        <select multiple class="form-control" id="featuresList">
+            {% for feature in features %}
+            <option value="{{ feature }}">{{ feature }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group row mx-0 mt-0">
+        <button type="button" onclick="initSearch()" class="btn btn-info col-5 mt-0"><i class="fas fa-redo"></i></button>
+        <button type="button" onclick="updateRooms()" class="btn btn-info col-5 offset-2 mt-0"><i class="fas fa-search"></i></button>
+    </div>
+</form>

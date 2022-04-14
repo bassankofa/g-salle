@@ -1,0 +1,69 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Modifier le profil{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-6 mx-auto mt-4">
+
+        <h1>Modifier le profil</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-info" style="margin-top: 20px;" data-toggle="tooltip" data-placement="top" title="Enregistrer">
+            <i class="fas fa-check"></i>
+        </button>
+        <button type="button" class="btn btn-info" style="margin-top: 20px;" data-toggle="tooltip" data-placement="top" title="Retour">
+            <a href="{{ path('user_index') }}" style="color: #fff;"><i class="fas fa-chevron-left"></i></a>
+        </button>
+        {{ form_end(form) }}
+
+        {% if user != app.user %}
+            <form id="form" method="post" action="{{ path('user_delete', {'id': user.id}) }}" style="position: relative;float: right;bottom: 38px;">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                <button class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Supprimer">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </form>
+        {% endif %}
+
+    </div>
+
+    {% include 'components/_confirm_modal.html.twig' %}
+
+{% endblock %}
+
+{% set modal_message = 'Voulez-vous vraiment supprimer le compte de ' ~ user.firstName ~ ' ' ~ user.lastName ~ ' ?' %}
+
+{% for unavailability in user.unavailabilities %}
+    {% if date() < unavailability.startDate %}
+        {% set modal_message = 'Au moins une réunion à venir est organisée par ' ~ user.firstName ~ ' ' ~ user.lastName ~ '. Si vous supprimez son compte, ces réunions seront également supprimées.' %}
+    {% endif %}
+{% endfor %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#confirmationMessage').text('{{ modal_message }}');
+        $('.modal-title').text('Avertissement');
+        $('#form').click(function(e) {
+            e.preventDefault();
+            $('#confirmationModal').modal({});
+
+            $('#confirm').on("click", function () {
+                $('#form').submit();
+                $("#confirmationModal").modal('hide');
+            });
+
+            $("#cancel").on("click", function(){
+                $("#confirmationModal").modal('hide');
+            });
+        });
+
+        // Customisation des boutons radio
+        $('.form-check').addClass('custom-control custom-radio');
+        $('.form-check-input').addClass('custom-control-input');
+        $('.form-check-label').addClass('custom-control-label');
+    </script>
+{% endblock %}

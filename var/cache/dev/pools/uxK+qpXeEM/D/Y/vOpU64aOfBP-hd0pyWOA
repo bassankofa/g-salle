@@ -1,0 +1,45 @@
+<?php //%255BApp%255CController%255CUnavailabilityController%2523edit%255D%255B1%255D
+
+return [PHP_INT_MAX, static function () { return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
+    $o = [
+        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['Symfony\\Component\\Routing\\Annotation\\Route'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\Routing\\Annotation\\Route')),
+        clone ($p['Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Security'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Security')),
+        clone $p['Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Security'],
+    ],
+    null,
+    [
+        'Symfony\\Component\\Routing\\Annotation\\Route' => [
+            'path' => [
+                '/modifier/reservation-{id}.html',
+            ],
+            'name' => [
+                'unavailability_edit',
+            ],
+            'methods' => [
+                [
+                    'GET',
+                    'POST',
+                ],
+            ],
+        ],
+        'Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Security' => [
+            'expression' => [
+                1 => 'unavailability != null',
+                '(unavailability.isOrganiser(user) or has_role(\'ROLE_ADMIN\')) and unavailability.isNotPast()',
+            ],
+            'statusCode' => [
+                1 => 404,
+            ],
+            'message' => [
+                1 => 'Cette réservation n\'existe plus ou n\'a jamais existé.',
+                'Vous n\'êtes pas autorisé à modifier cette réservation.',
+            ],
+        ],
+    ],
+    [
+        $o[0],
+        $o[1],
+        $o[2],
+    ],
+    []
+); }];

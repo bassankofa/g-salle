@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Réservation{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-6 mx-auto mt-4">
+
+        <h1>Réservation de la salle {{ unavailability.room.name }}</h1>
+        <h3>du {{ unavailability.startDate | date('d/m/Y à H\\hi') ~ ' au ' ~ unavailability.endDate | date('d/m/Y à H\\hi') }}</h3>
+
+        {{ include('unavailability/_form.html.twig') }}
+
+    </div>
+
+{% endblock %}

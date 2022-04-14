@@ -1,0 +1,75 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Membres{% endblock %}
+
+{% block content %}
+    <div class="jumbotron col-md-9 mx-auto mt-4">
+        {% for message in app.flashes('notice') %}
+            <div class="mb-4 py-2 reunionit-addflash">
+                {{ message }}
+            </div>
+        {% endfor %}
+        <div class="row">
+            <h1 class="col-sm-10">Utilisateurs</h1>
+
+            <div class="col-sm-2">
+                <a class="text-white" href="{{ path('user_new') }}">
+                    <button class="btn btn-info float-right" data-toggle="tooltip" data-placement="top" title="Ajouter un membre">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div class="pagerfanta">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Qualité</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if user_pager %}
+                {% for user in user_pager %}
+                    <tr>
+                        <td>{{ user.lastName }}</td>
+                        <td>{{ user.firstName }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.roles ? user.roles|join(', ')|role_formatPicto : '' }}</td>
+                        <td class="last-column">
+                            <a href="{{ path('user_show', {'id': user.id}) }}" style="text-decoration: none;">
+                                <i class="far fa-eye" data-toggle="tooltip" data-placement="top" title="Voir"></i>
+                            </a>
+                            <a class="ml-2" href="{{ path('user_edit', {'id': user.id}) }}">
+                                <i class="fas fa-user-edit" data-toggle="tooltip" data-placement="top" title="Editer"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">Aucun utilisateur enregistré.</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+            {% if user_pager and user_pager.haveToPaginate %}
+                {{ pagerfanta(user_pager, 'reunion_it') }}
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Historique{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-9 mx-auto mt-4">
+
+        <h1>Historique de l'occupation des salles</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Objet</th>
+                    <th>Salle</th>
+                    <th>Organisateur</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    <th>Type</th>
+                    <th> </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if unavailabilities_pager %}
+            {% for unavailability in unavailabilities_pager %}
+                <tr {{ unavailability.startDate < date() ? 'class="table-active "' : '' }}>
+                    <td>{{ unavailability.object }}</td>
+                    <td>{{ unavailability.room.name }}</td>
+                    <td>{{ unavailability.organiser.firstName ~ ' ' ~ unavailability.organiser.lastName }}</td>
+                    <td>Le {{ unavailability.startDate ? unavailability.startDate|date('d/m/Y à H:i') : '' }}</td>
+                    <td>Le {{ unavailability.endDate ? unavailability.endDate|date('d/m/Y à H:i') : '' }}</td>
+                    <td>{{ unavailability.type == 0 ? 'Réunion' : 'Autre' }}</td>
+                    <td class="last-column">
+                        <a href="{{ path('unavailability_show', {'id': unavailability.id}) }}" style="text-decoration: none;">
+                            <i class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="Voir"></i>
+                        </a>
+                        {% if date() < unavailability.startDate %}
+                        <a href="{{ path('unavailability_edit', {'id': unavailability.id}) }}">
+                            <i class="fas fa-edit ml-2" data-toggle="tooltip" data-placement="top" title="Editer"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <tr>
+                    <td>Aucune réservation enregistrée.</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+        {% if unavailabilities_pager and unavailabilities_pager.haveToPaginate %}
+            {{ pagerfanta(unavailabilities_pager, 'reunion_it') }}
+        {% endif %}
+    </div>
+
+{% endblock %}

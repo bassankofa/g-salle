@@ -1,0 +1,140 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Réservation{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-9 mx-auto mt-4">
+
+        <div class="d-flex">
+
+            <h1 class="mr-auto">Réservation</h1>
+
+            {% if is_granted('ROLE_EMPLOYEE') %}
+
+            <div class="btn-group" role="group">
+                <a href="{{ path('unavailability_calendar') }}" style="color: #fff;">
+                    <button type="button" class="btn btn-info" style="width: 45px;" data-toggle="tooltip" data-placement="top" title="Calendrier">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </a>
+                {% if is_granted('ROLE_ADMIN') or unavailability.organiser == app.user %}
+                    {# On n'affiche les boutons 'edit' et 'delete' seulement si la réunion n'a pas commencé #}
+                    {% if date() < date(unavailability.startDate) %}
+                        <a href="{{ path('unavailability_edit', {'id': unavailability.id}) }}" style="color: #fff;">
+                            <button type="button" class="btn btn-info" style="width: 45px;margin-left: 5px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </a>
+                        <form id="form" method="post" action="{{ path('unavailability_delete', {'id': unavailability.id}) }}" style="display: inline-block;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ unavailability.id) }}">
+                            <button class="btn btn-warning" style="width: 45px;margin-left: 5px;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+        </div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Objet</th>
+                    <td>{{ unavailability.object }}</td>
+                </tr>
+                <tr>
+                    <th>Organisateur</th>
+                    <td>
+                        {# On désactive le lien vers l'organisateur s'il n'existe plus #}
+                        {% if null == unavailability.organiser.deletedAt %}
+                            <a href="{{ path('user_show', {'id': unavailability.organiser.id}) }}">
+                                {{ unavailability.organiser.firstName ~ ' ' ~ unavailability.organiser.lastName }}
+                            </a>
+                        {% else %}
+                            <span data-toggle="tooltip" data-placement="top" title="Compte supprimé">
+                                {{ unavailability.organiser.firstName ~ ' ' ~ unavailability.organiser.lastName }}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Salle</th>
+                    <td>
+                        {# On désactive le lien vers la salle si elle n'existe plus #}
+                        {% if null == unavailability.room.deletedAt %}
+                            <a href="{{ path('room_show', {'id': unavailability.room.id}) }}">
+                                {{ unavailability.room.name }}
+                            </a>
+                        {% else %}
+                            {{ unavailability.room.name }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Début</th>
+                    <td>{{ unavailability.startDate ? unavailability.startDate|date('\\L\\e d/m/Y à H:i') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Fin</th>
+                    <td>{{ unavailability.endDate ? unavailability.endDate|date('\\L\\e d/m/Y à H:i') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Invités</th>
+                    <td>
+                        {% for guest in unavailability.guests %}
+                            {# On désactive le lien vers l'utilisateur s'il n'existe plus #}
+                            {% if null == guest.deletedAt %}
+                            <a href="{{ path('user_show', {'id': guest.id}) }}">
+                                {{ guest.firstName ~ ' ' ~ guest.lastName }}{% if not loop.last %}, {% endif %}
+                            </a>
+                            {% else %}
+                                <span data-toggle="tooltip" data-placement="top" title="Compte supprimé">
+                                    {{ guest.firstName ~ ' ' ~ guest.lastName }}{% if not loop.last %}, {% endif %}
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ unavailability.type == 0 ? 'Réunion' : 'Autre' }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+    {% include 'components/_confirm_modal.html.twig' %}
+
+{% endblock %}
+
+{% set modal_message = 'Voulez-vous vraiment supprimer cette réservation ?' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#confirmationMessage').text('{{ modal_message }}');
+        $('.modal-title').text('Supprimer la réservation');
+        $('#form').click(function(e) {
+            e.preventDefault();
+            $('#confirmationModal').modal({});
+
+            $('#confirm').on("click", function () {
+                $('#form').submit();
+                $("#confirmationModal").modal('hide');
+            });
+
+            $("#cancel").on("click", function(){
+                $("#confirmationModal").modal('hide');
+            });
+        });
+    </script>
+{% endblock %}
+

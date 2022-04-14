@@ -1,0 +1,82 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Nouvelle salle{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-6 mx-auto mt-4">
+
+    <h1>Nouvelle salle</h1>
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+        {{ form_row(form.name) }}
+
+        {{ form_row(form.capacity) }}
+
+        {{ form_errors(form.features) }}
+        <div class="form-group">
+            {{ form_label(form.features) }}
+            {% set salle = form.vars.value %}
+            {% for feature in form.features %}
+                {{ form_widget(feature) }}
+            {% endfor %}
+        </div>
+
+        <p>
+            {{ form_errors(form.picture) }}
+        </p>
+        {{ form_widget(form.picture) }}
+
+        <button class="btn btn-info" style="margin-top: 20px;" data-toggle="tooltip" data-placement="top" title="Enregistrer">
+            <i class="fas fa-check"></i>
+        </button>
+        <button type="button" class="btn btn-info" style="margin-top: 20px;" data-toggle="tooltip" data-placement="top" title="Retour">
+            <a href="{{ path('room_index') }}" style="color: #fff;">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </button>
+
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.css" integrity="sha256-Kq686ftxGamHGd8MpwJXmYgk1s7m00maEfHX1VpKYP8=" crossorigin="anonymous" />
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <style>
+        /* On empêche Bootstrap d'afficher le bouton File Input dans le bloc Dropify */
+        .custom-file-label {
+            display: none;
+        }
+        label[for="room-capacity"] {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js" integrity="sha256-SUaao5Q7ifr2twwET0iyXVy0OVnuFJhGVi5E/dqEiLU=" crossorigin="anonymous"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script>
+        $('.dropify').dropify({
+            messages: {
+                default: 'Glissez-d&eacute;posez une image ici ou cliquez',
+                replace: 'Glissez-d&eacute;posez une image ou cliquez pour remplacer',
+                remove:  'Supprimer',
+                error:   'D&eacute;sol&eacute;, le fichier est trop volumineux'
+            }
+        });
+
+        // Customisation des checkboxes
+        $('.form-check').addClass('custom-control custom-checkbox');
+        $('.form-check-input').addClass('custom-control-input');
+        $('.form-check-label').addClass('custom-control-label');
+
+    </script>
+{% endblock %}
+

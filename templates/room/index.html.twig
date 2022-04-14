@@ -1,0 +1,142 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Nos salles{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-9 mx-auto mt-4">
+
+        {% for message in app.flashes('notice') %}
+            <div class="mb-4 py-2 reunionit-addflash">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <h1 class="col-sm-9">Nos salles de réunion</h1>
+
+            {% if is_granted('IS_AUTHENTICATED_FULLY') and is_granted('ROLE_ADMIN') %}
+                <div class="col-sm-3">
+                    <a class="text-white" href="{{ path('room_new') }}">
+                        <button class="btn btn-info float-right" data-toggle="tooltip" data-placement="top" title="Ajouter une salle">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <button type="button" onclick="displaySearch(this)" class="btn btn-outline-info btn-lg btn-block btn-group-toggle" data-toggle="buttons">
+            <i class="fas fa-search"></i>
+            <i class="fas fa-angle-down" id="arrowDown"></i>
+            <i class="fas fa-angle-up" id="arrowUp" style="display:none;"></i>
+        </button>
+
+        <div id="room_search" style="display:none;">
+            {{ include('room/_search.html.twig')}}
+        </div>
+
+        <hr>
+
+        <div class="row text-center" id="roomList">
+            {% for room in rooms %}
+                <div class="roomCard col-11 col-sm-6 col-lg-4 col-xl-3 mb-sm-4 position-relative"
+                     data-infos='{"capacity":{{ room.capacity }},"features":["{{ room.features|join('","') }}"]}'>
+                    <div class="card mb-3 mx-auto">
+                        <a href="{{ path('room_show', {'id': room.id}) }}">
+                            <div class="card-img-top" style="background-image: url('{{ asset('images/room/' ~ room.picture) }}');">
+                            </div>
+                        </a>
+                        <div class="card-body">
+                            <a href="{{ path('room_show', {'id': room.id}) }}">
+                                <h2 class="card-title" style="font-size: 1.5rem;" data-toggle="tooltip" data-placement="top" title="{{ room.features ? room.features|join(', ') : '' }}">
+                                    {{ room.name }}
+                                </h2>
+                            </a>
+                            <p class="card-text">
+                                <i class="fas fa-user" style="font-size:1.3rem"></i>&nbsp<sup style="font-size: 1rem;" class="roomCapacity">{{ room.capacity }}</sup>
+                            </p>
+                            {% if is_granted('IS_AUTHENTICATED_FULLY') and is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('room_edit', {'id': room.id}) }}" class="btn btn-info" style="position:absolute;top:0;right:0;">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var element = document.getElementById("room_search");
+        var arrowUp = document.getElementById("arrowUp");
+        var arrowDown = document.getElementById("arrowDown");
+        function displaySearch(button) {
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+                arrowUp.style.display = 'inline-block';
+                arrowDown.style.display = 'none';
+            } else {
+                element.style.display = 'none';
+                arrowUp.style.display = 'none';
+                arrowDown.style.display = 'inline-block';
+            }
+        }
+
+        function updateRooms() {
+            $('.roomCard').show();
+
+            var selectedFeatures = $('#featuresList').val();
+            var selectedCapacity = JSON.parse($('#roomCapacitySelect').val());
+            console.log(selectedCapacity);
+
+            $('#roomList .roomCard').each(function () {
+                var card = $(this);
+                var infos = card.data('infos');
+
+                var featuresByRoom = infos.features;
+                var capacityByRoom = infos.capacity;
+
+                if (!(findRoomWithThisFeatures(selectedFeatures, featuresByRoom)
+                    && findRoomWithThisCapacity(selectedCapacity, capacityByRoom))){
+                    card.hide();
+                }
+            })
+        }
+        function initSearch() {
+            var capacity = document.getElementById("roomCapacitySelect").options;
+            capacity[0].selected = true;
+
+            var features = document.getElementById("featuresList").options;
+            for(var i = 0; i < features.length; i++){
+                features[i].selected = false;
+            }
+            $('.roomCard').show();
+            console.log('init');
+        }
+        function findRoomWithThisFeatures (haystack, arr) {
+            // alert(haystack.every(o => arr.includes(o)));
+            return haystack.every(o => arr.includes(o));
+        }
+        function findRoomWithThisCapacity (selectedCapacity, capacityByRoom) {
+            // var minSelectedCapacity = selectedCapacity.min;
+            var minSelectedCapacity = selectedCapacity === null ? 0 : selectedCapacity.min;
+
+            if(selectedCapacity === null || selectedCapacity.max === undefined) {
+                return minSelectedCapacity <= capacityByRoom;
+            }
+
+            var maxSelectedCapacity = selectedCapacity.max;
+
+            return ( minSelectedCapacity <= capacityByRoom && capacityByRoom <= maxSelectedCapacity );
+        }
+    </script>
+{% endblock %}

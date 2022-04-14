@@ -1,0 +1,7 @@
+<form id="form" method="post" action="{{ path('unavailability_delete', {'id': unavailability.id}) }}" style="position: relative;float: right;bottom: 38px;">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ unavailability.id) }}">
+    <button class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Supprimer">
+        <i class="fas fa-trash-alt"></i>
+    </button>
+</form>

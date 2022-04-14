@@ -1,0 +1,221 @@
+{% set day_start = constant('App\\Entity\\Unavailability::DAY_START') %}
+{% set day_end = constant('App\\Entity\\Unavailability::DAY_END') %}
+
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Salle {{ room.name }}{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-9 mx-auto mt-5">
+
+        <div class="row mt-0 mb-5">
+            <a href="#" id="thumbnailPicture" class="card card-img-top col col-lg-3 mb-2 mb-lg-0"
+               style="background-image: url('{{ asset('images/room/'~room.picture) }}')">
+            </a>
+            <div class="col-lg-9 d-flex align-items-stretch flex-column">
+                <div class="mb-auto d-flex">
+                    <h1 class="mr-auto">Salle {{ room.name }}</h1>
+                    <div class="btn-group" role="group">
+                        {% if is_granted('ROLE_EMPLOYEE') %}
+                            <a href="{{ path('room_index') }}" style="color: #fff;">
+                                <button type="button" class="btn btn-info" style="width: 45px;">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                            </a>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('room_edit', {'id': room.id}) }}" style="color: #fff;">
+                                <button type="button" class="btn btn-info" style="width: 45px;margin-left: 5px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </a>
+                            <form id="form" method="post" action="{{ path('room_delete', {'id': room.id}) }}" style="display: inline-block;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ room.id) }}">
+                                <button class="btn btn-warning" style="width: 45px;margin-left: 5px;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <table class="table table-active m-0">
+                        <tbody>
+                        <tr class="lead">
+                            <th>Capacité :</th>
+                            <td>{{ room.capacity }} personnes</td>
+                        </tr>
+                        <tr class="lead">
+                            <th>Options :</th>
+                            <td>{{ room.features ? room.features|join(', ') : '' }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {% if is_granted('ROLE_EMPLOYEE') %}
+            {% include '@FullCalendar/Calendar/calendar.html.twig' %}
+        {% endif %}
+
+    </div>
+
+    {% include 'room/_large_picture_modal.html.twig' %}
+
+    {% include 'room/_dates_confirm_modal.html.twig' %}
+
+    {% include 'components/_confirm_modal.html.twig' %}
+
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/fullcalendar/css/fullcalendar/fullcalendar.min.css') }}" />
+    <style>
+        .fc-today {
+            background: #45585055 !important;
+            /*border: none !important;*/
+            /*border-top: 1px solid #ddd !important;*/
+            /*font-weight: bold;*/
+        }
+    </style>
+{% endblock %}
+
+{% set modal_message = 'Voulez-vous vraiment supprimer la salle ' ~ room.name ~ ' ?' %}
+
+{% for unavailability in room.unavailabilities %}
+
+    {% if date() < unavailability.startDate %}
+        {% set modal_message = 'Des réunions à venir sont organisées dans la salle ' ~ room.name ~
+            '. Si vous la supprimez, ces réunions seront également supprimées.' %}
+    {% endif %}
+{% endfor %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/fullcalendar/js/fullcalendar/lib/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/fullcalendar/js/fullcalendar/fullcalendar.min.js') }}"></script>
+    <script src='{{ asset('bundles/fullcalendar/js/fullcalendar/locale/fr.js') }}'></script>
+    {#<script src="{{ asset('js/reunionit_room_calendar.js') }}"></script>#}
+    <script>
+        // Paramétrage du calendrier (cf. documentation de fullCalendar)
+        $(function () {
+            $('#calendar-holder').fullCalendar({
+                themeSystem: 'bootstrap4',
+                contentHeight: "auto",
+                locale: 'fr',
+                timezone: "Europe/Paris",
+                now: '{{ "now"|date("m/d/Y H:i") }}',
+                header: {
+                    left: 'today',
+                    center: 'title',
+                    right: 'month, agendaWeek, agendaDay, prev, next'
+                },
+                businessHours: {
+                    start: "{{ day_start }}",
+                    end: "{{ day_end }}",
+                    dow: [1, 2, 3, 4, 5]
+                },
+                lazyFetching: true,
+                navLinks: true,
+                // Si la largeur de la fenêtre (ou de l'écran) est inférieure à 765px de large,
+                // on n'affiche que la journée courante, sinon on affiche la semaine courante.
+                defaultView: $(window).width() < 765 ? 'agendaDay':'agendaWeek',
+                slotDuration: '00:30:00',
+                weekends: false,
+                minTime: "{{ day_start }}",
+                maxTime: "{{ day_end }}",
+                nowIndicator: true,
+                selectable: true,
+                selectContraints: "businessHours",
+                // On n'autorise la réservation qu'à partir de l'heure courante.
+                selectAllow: function(select) {
+                    return moment().diff(select.start) <= 0;
+                },
+                selectOverlap: false,
+                unselectCancel: '#datesConfirm',
+                select: function(startDate, endDate) {
+                    // S'il s'agit de journée(s) complète(s), on fixe les heures de début et de fin.
+                    if (!startDate.hasTime() || !endDate.hasTime()) {
+                        startDate.time('{{ day_start }}');
+                        endDate.time('{{ day_end }}');
+                        if (endDate >= startDate.clone().add(1, 'days')) {
+                            endDate.add(-1, 'days')
+                        }
+                    }
+
+                    // On fixe l'heure de début mini et l'heure de fin maxi.
+                    const start = parseInt(startDate.format("{{ day_start }}"))
+                    <= parseInt(startDate.format('HH')) ?
+                        startDate.format('DD/MM/YYYY HH:mm') : startDate.format('DD/MM/YYYY ' + '{{ day_start }}');
+
+                    const end = parseInt(startDate.format("{{ day_start }}"))
+                    <= parseInt(endDate.format('HH')) && parseInt(endDate.format('HH'))
+                    <= parseInt(endDate.format("{{ day_end }}")) ?
+                        endDate.format('DD/MM/YYYY HH:mm') : endDate.format('DD/MM/YYYY ' + '{{ day_end }}');
+
+                    // On demande une confirmation à l'utilisateur
+                    const confirmationMessage = 'Réserver la salle {{ room.name }} pour la période du '
+                        + start + ' au '
+                        + end + ' ?' ;
+                    $('#datesConfirmationMessage').text(confirmationMessage);
+                    $('.modal-title').text('Vérifiez les dates');
+
+                    $('#datesConfirmationModal').modal({});
+
+                    $("#datesConfirm").on("click", function(){
+                        window.location.href = '{{ path('unavailability_new') }}'
+                            + '?startDate=' + encodeURIComponent(start)
+                            + '&endDate=' + encodeURIComponent(end)
+                            + '&roomId={{ room.id }}';
+                        $("#datesConfirmationModal").modal('hide');
+                    });
+
+                    $("#datesCancel").on("click", function(){
+                        // this.unselect();
+                        $("#datesConfirmationModal").modal('hide');
+                    });
+                },
+                eventSources: [
+                    {
+                        url: 'fc-load-events',
+                        type: 'POST',
+                        data: {
+                            filters: {
+                                'id': {{ room.id }}
+                            }
+                        },
+                        error: function () {
+                            alert('L\'affichage du calendrier a renvoyé une erreur !');
+                        }
+                    }
+                ],
+                timeFormat: 'H(:mm)' // uppercase H for 24-hour clock
+            });
+
+            $('#thumbnailPicture').on("click", function () {
+                $('#largePicture').modal({});
+            });
+        });
+
+        $('#confirmationMessage').text('{{ modal_message }}');
+        $('.modal-title').text('Supprimer la salle');
+        $('#form').click(function(e) {
+            e.preventDefault();
+            $('#confirmationModal').modal({});
+
+            $('#confirm').on("click", function () {
+                $('#form').submit();
+                $("#confirmationModal").modal('hide');
+            });
+
+            $("#cancel").on("click", function(){
+                $("#confirmationModal").modal('hide');
+            });
+        });
+    </script>
+{% endblock %}

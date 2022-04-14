@@ -1,0 +1,149 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ user.firstName ~' '~ user.lastName }}{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron col-md-9 mx-auto mt-4">
+
+        {% for message in app.flashes('notice') %}
+            <div class="mb-4 py-2 reunionit-addflash">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <h1 class="mr-auto">{{ user.firstName ~' '~ user.lastName }}</h1>
+
+            {% if is_granted('ROLE_EMPLOYEE') %}
+            <div class="btn-group" role="group">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('user_index') }}" style="color: #fff;">
+                        <button type="button" class="btn btn-info" style="width: 45px;">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </a>
+                    <a href="{{ path('user_edit', {'id': user.id}) }}" style="color: #fff;">
+                        <button type="button" class="btn btn-info" style="width: 45px;margin-left: 5px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </a>
+                    {% if user != app.user %}
+                        <form id="form" method="post" action="{{ path('user_delete', {'id': user.id}) }}" style="display: inline-block;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                            <button class="btn btn-warning" style="width: 45px;margin-left: 5px;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>
+                        Qualité
+                    </th>
+                    <td>
+                        {{ user.roles ? user.roles|join(', ') |role_format : '' }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Email
+                    </th>
+                    <td>
+                        <a href="mailto:{{ user.email }}">
+                            {{ user.email }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Téléphone
+                    </th>
+                    <td>
+                        Non renseigné
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Service
+                    </th>
+                    <td>
+                        Non renseigné
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Dernière connexion
+                    </th>
+                    <td>
+                        Non renseigné
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if user.id == app.user.id %}
+            <a href="{{ path('password_change') }}" class="btn btn-primary">Mettre à jour mon mot de passe</a>
+        {% endif %}
+
+    </div>
+
+    {% include 'components/_confirm_modal.html.twig' %}
+
+{% endblock %}
+
+{% set modal_message = 'Voulez-vous vraiment supprimer le compte de ' ~ user.firstName ~ ' ' ~ user.lastName ~ ' ?' %}
+
+{% for unavailability in user.unavailabilities %}
+    {% if date() < unavailability.startDate %}
+        {% set message = 'Des réunions à venir sont organisées par ' ~ user.firstName ~ ' ' ~ user.lastName ~
+            '. Si vous supprimez son compte, ces réunions seront également supprimées.' %}
+    {% endif %}
+{% endfor %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#confirmationMessage').text('{{ modal_message }}');
+        $('.modal-title').text('Supprimer le compte');
+        $('#form').click(function(e) {
+            e.preventDefault();
+            $('#confirmationModal').modal({});
+
+            $('#confirm').on("click", function () {
+                $('#form').submit();
+                $("#confirmationModal").modal('hide');
+            });
+
+            $("#cancel").on("click", function(){
+                $("#confirmationModal").modal('hide');
+            });
+        });
+
+        {#$('#form').click(function(e) {#}
+            {#e.preventDefault();#}
+            {#$.ajax({#}
+                {#method: 'POST',#}
+                {#url: '{{ path('user_delete_confirm', { 'id': user.id }) }}',#}
+                {#data: $('#form').serialize(),#}
+                {#success: function (data) {#}
+                    {#console.log(data);#}
+                    {#if (data.ask) {#}
+                        {#if (confirm('{{ message }}')) {#}
+                            {#$('#form').submit();#}
+                        {#}#}
+                    {#}#}
+                {#},#}
+                {#fail: function() {#}
+                    {#alert('error');#}
+                {#}#}
+            {#});#}
+        {#});#}
+    </script>
+{% endblock %}
