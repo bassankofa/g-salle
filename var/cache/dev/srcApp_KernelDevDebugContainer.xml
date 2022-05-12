@@ -25,6 +25,7 @@
       <parameter key="DoctrineFixturesBundle">Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle</parameter>
       <parameter key="WhiteOctoberPagerfantaBundle">WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle</parameter>
       <parameter key="StofDoctrineExtensionsBundle">Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle</parameter>
+      <parameter key="TwigExtraBundle">Twig\Extra\TwigExtraBundle\TwigExtraBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -90,6 +91,10 @@
       <parameter key="StofDoctrineExtensionsBundle" type="collection">
         <parameter key="path">/home/sankofa-impact/www-bass/reunionIT/vendor/stof/doctrine-extensions-bundle/src</parameter>
         <parameter key="namespace">Stof\DoctrineExtensionsBundle</parameter>
+      </parameter>
+      <parameter key="TwigExtraBundle" type="collection">
+        <parameter key="path">/home/sankofa-impact/www-bass/reunionIT/vendor/twig/extra-bundle</parameter>
+        <parameter key="namespace">Twig\Extra\TwigExtraBundle</parameter>
       </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
@@ -265,19 +270,25 @@
     <parameter key="security.authentication.session_strategy.strategy">migrate</parameter>
     <parameter key="security.access.always_authenticate_before_granting">false</parameter>
     <parameter key="security.authentication.hide_user_not_found">true</parameter>
-    <parameter key="swiftmailer.mailer.default.transport.name">dynamic</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.name">smtp</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.encryption">null</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.port">587</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.host">ssl0.ovh.net</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.username">emma.gomis@adsglobalcorp.com</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.password">@dsgroup2022</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.auth_mode">login</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.timeout">30</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.source_ip">null</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.local_domain">null</parameter>
+    <parameter key="swiftmailer.mailer.default.transport.smtp.stream_options" type="collection"/>
     <parameter key="swiftmailer.spool.default.memory.path">/home/sankofa-impact/www-bass/reunionIT/var/cache/dev/swiftmailer/spool/default</parameter>
     <parameter key="swiftmailer.mailer.default.spool.enabled">true</parameter>
     <parameter key="swiftmailer.mailer.default.plugin.impersonate">null</parameter>
-    <parameter key="swiftmailer.mailer.default.single_address">superparisian@gmail.com</parameter>
-    <parameter key="swiftmailer.mailer.default.delivery_addresses" type="collection">
-      <parameter>superparisian@gmail.com</parameter>
-    </parameter>
-    <parameter key="swiftmailer.mailer.default.delivery_whitelist" type="collection"/>
+    <parameter key="swiftmailer.mailer.default.single_address">null</parameter>
     <parameter key="swiftmailer.mailer.default.delivery.enabled">true</parameter>
     <parameter key="swiftmailer.spool.enabled">true</parameter>
     <parameter key="swiftmailer.delivery.enabled">true</parameter>
-    <parameter key="swiftmailer.single_address">superparisian@gmail.com</parameter>
+    <parameter key="swiftmailer.single_address">null</parameter>
     <parameter key="swiftmailer.mailers" type="collection">
       <parameter key="default">swiftmailer.mailer.default</parameter>
     </parameter>
@@ -421,6 +432,9 @@
         <argument type="service" id=".service_locator.vdmMuyE.App\Controller\FrontController"/>
       </call>
     </service>
+    <service id="App\Controller\PrinterCalendarController" class="App\Controller\PrinterCalendarController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+    </service>
     <service id="App\Controller\RoomController" class="App\Controller\RoomController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -470,26 +484,36 @@
       <argument type="service" id="doctrine.orm.default_entity_manager"/>
       <argument type="service" id="router.default"/>
     </service>
+    <service id="App\Form\ImprimerPeriodeType" class="App\Form\ImprimerPeriodeType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
     <service id="App\Form\Model\ChangePassword" class="App\Form\Model\ChangePassword" autowire="true" autoconfigure="true"/>
     <service id="App\Form\RoomType" class="App\Form\RoomType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
       <argument type="service" id="App\Provider\FeaturesProvider"/>
     </service>
+    <service id="App\Form\TypeReservationType" class="App\Form\TypeReservationType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
     <service id="App\Form\UnavailabilityAdminType" class="App\Form\UnavailabilityAdminType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
       <argument type="service" id="App\Repository\UserRepository"/>
+      <argument type="service" id="App\Repository\TypeReservationRepository"/>
     </service>
     <service id="App\Form\UnavailabilityEditAdminType" class="App\Form\UnavailabilityEditAdminType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
       <argument type="service" id="App\Repository\UserRepository"/>
+      <argument type="service" id="App\Repository\TypeReservationRepository"/>
     </service>
     <service id="App\Form\UnavailabilityEditType" class="App\Form\UnavailabilityEditType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
       <argument type="service" id="App\Repository\UserRepository"/>
+      <argument type="service" id="App\Repository\TypeReservationRepository"/>
     </service>
     <service id="App\Form\UnavailabilityType" class="App\Form\UnavailabilityType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
       <argument type="service" id="App\Repository\UserRepository"/>
+      <argument type="service" id="App\Repository\TypeReservationRepository"/>
     </service>
     <service id="App\Form\UserAdminType" class="App\Form\UserAdminType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
@@ -508,6 +532,10 @@
       </call>
     </service>
     <service id="App\Repository\RoomRepository" class="App\Repository\RoomRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
+    <service id="App\Repository\TypeReservationRepository" class="App\Repository\TypeReservationRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
@@ -921,7 +949,9 @@
         <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
       </argument>
       <argument type="collection">
+        <argument>App\Form\ImprimerPeriodeType</argument>
         <argument>App\Form\RoomType</argument>
+        <argument>App\Form\TypeReservationType</argument>
         <argument>App\Form\UnavailabilityAdminType</argument>
         <argument>App\Form\UnavailabilityEditAdminType</argument>
         <argument>App\Form\UnavailabilityEditType</argument>
@@ -1190,7 +1220,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension" public="false">
-      <argument type="service" id=".service_locator.LapLCWV"/>
+      <argument type="service" id=".service_locator.C8QJ2WF"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -1787,6 +1817,8 @@
           <argument>/home/sankofa-impact/www-bass/reunionIT/src/Resources/WhiteOctoberPagerfantaBundle/translations</argument>
           <argument>/home/sankofa-impact/www-bass/reunionIT/vendor/stof/doctrine-extensions-bundle/src/Resources/translations</argument>
           <argument>/home/sankofa-impact/www-bass/reunionIT/src/Resources/StofDoctrineExtensionsBundle/translations</argument>
+          <argument>/home/sankofa-impact/www-bass/reunionIT/vendor/twig/extra-bundle/Resources/translations</argument>
+          <argument>/home/sankofa-impact/www-bass/reunionIT/src/Resources/TwigExtraBundle/translations</argument>
           <argument>/home/sankofa-impact/www-bass/reunionIT/src/Resources/translations</argument>
         </argument>
         <argument key="cache_vary" type="collection">
@@ -1827,6 +1859,8 @@
             <argument>src/Resources/WhiteOctoberPagerfantaBundle/translations</argument>
             <argument>vendor/stof/doctrine-extensions-bundle/src/Resources/translations</argument>
             <argument>src/Resources/StofDoctrineExtensionsBundle/translations</argument>
+            <argument>vendor/twig/extra-bundle/Resources/translations</argument>
+            <argument>src/Resources/TwigExtraBundle/translations</argument>
             <argument>src/Resources/translations</argument>
           </argument>
         </argument>
@@ -3273,7 +3307,7 @@
       <factory class="Doctrine\ORM\EntityManager" method="create"/>
     </service>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory" public="false">
-      <argument type="service" id=".service_locator.YTH63es"/>
+      <argument type="service" id=".service_locator.RomZSRK"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -4356,25 +4390,52 @@
       </call>
     </service>
     <service id="swiftmailer.mailer.default.transport.eventdispatcher" class="Swift_Events_SimpleEventDispatcher" public="false"/>
-    <service id="swiftmailer.mailer.default.transport.dynamic" class="Swift_Transport">
+    <service id="swiftmailer.mailer.default.transport.authhandler" class="Swift_Transport_Esmtp_AuthHandler" public="false">
       <argument type="collection">
-        <argument key="transport">smtp</argument>
-        <argument key="url">%env(MAILER_URL)%</argument>
-        <argument key="username">null</argument>
-        <argument key="password">null</argument>
-        <argument key="host">localhost</argument>
-        <argument key="port">null</argument>
-        <argument key="timeout">30</argument>
-        <argument key="source_ip">null</argument>
-        <argument key="local_domain">null</argument>
-        <argument key="encryption">null</argument>
-        <argument key="auth_mode">null</argument>
-        <argument key="command">/usr/sbin/sendmail -t -i </argument>
-        <argument key="stream_options" type="collection"/>
+        <argument type="service" id=".1_Swift_Transport_Esmtp_Auth_CramMd5Authenticator~XomH8MQ"/>
+        <argument type="service" id=".2_Swift_Transport_Esmtp_Auth_LoginAuthenticator~XomH8MQ"/>
+        <argument type="service" id=".3_Swift_Transport_Esmtp_Auth_PlainAuthenticator~XomH8MQ"/>
+        <argument type="service" id=".4_Swift_Transport_Esmtp_Auth_NTLMAuthenticator~XomH8MQ"/>
       </argument>
+      <call method="setUsername">
+        <argument>emma.gomis@adsglobalcorp.com</argument>
+      </call>
+      <call method="setPassword">
+        <argument>@dsgroup2022</argument>
+      </call>
+      <call method="setAuthMode">
+        <argument>login</argument>
+      </call>
+    </service>
+    <service id="swiftmailer.mailer.default.transport.buffer" class="Swift_Transport_StreamBuffer" public="false">
+      <argument type="service" id="swiftmailer.transport.replacementfactory"/>
+    </service>
+    <service id="swiftmailer.transport.configurator.default" class="Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SmtpTransportConfigurator" public="false">
+      <argument>null</argument>
       <argument type="service" id="router.request_context" on-invalid="null"/>
+    </service>
+    <service id="swiftmailer.mailer.default.transport.smtp" class="Swift_Transport_EsmtpTransport" public="false">
+      <argument type="service" id="swiftmailer.mailer.default.transport.buffer"/>
+      <argument type="collection">
+        <argument type="service" id="swiftmailer.mailer.default.transport.authhandler"/>
+      </argument>
       <argument type="service" id="swiftmailer.mailer.default.transport.eventdispatcher"/>
-      <factory class="Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerTransportFactory" method="createTransport"/>
+      <call method="setHost">
+        <argument>ssl0.ovh.net</argument>
+      </call>
+      <call method="setPort">
+        <argument>587</argument>
+      </call>
+      <call method="setEncryption">
+        <argument>null</argument>
+      </call>
+      <call method="setTimeout">
+        <argument>30</argument>
+      </call>
+      <call method="setSourceIp">
+        <argument>null</argument>
+      </call>
+      <configurator service="swiftmailer.transport.configurator.default" method="configure"/>
     </service>
     <service id="swiftmailer.mailer.default" class="Swift_Mailer" public="true">
       <argument type="service" id="swiftmailer.mailer.default.transport.spool"/>
@@ -4384,16 +4445,8 @@
       <argument type="service" id="swiftmailer.mailer.default.transport.eventdispatcher"/>
       <argument type="service" id="swiftmailer.mailer.default.spool.memory"/>
       <call method="registerPlugin">
-        <argument type="service" id="swiftmailer.mailer.default.plugin.redirecting"/>
-      </call>
-      <call method="registerPlugin">
         <argument type="service" id="swiftmailer.mailer.default.plugin.messagelogger"/>
       </call>
-    </service>
-    <service id="swiftmailer.mailer.default.plugin.redirecting" class="Swift_Plugins_RedirectingPlugin" public="false">
-      <tag name="swiftmailer.default.plugin"/>
-      <argument>%swiftmailer.mailer.default.delivery_addresses%</argument>
-      <argument type="collection"/>
     </service>
     <service id="swiftmailer.mailer.default.plugin.messagelogger" class="Swift_Plugins_MessageLogger" public="true">
       <tag name="swiftmailer.default.plugin"/>
@@ -4467,12 +4520,27 @@
       <call method="addExtension">
         <argument type="service" id="twig.extension.pagerfanta"/>
       </call>
+      <call method="addExtension">
+        <argument type="service" id="twig.extension.intl"/>
+      </call>
       <call method="addGlobal">
         <argument>app</argument>
         <argument type="service" id="twig.app_variable"/>
       </call>
       <call method="addRuntimeLoader">
         <argument type="service" id="twig.runtime_loader"/>
+      </call>
+      <call method="registerUndefinedFilterCallback">
+        <argument type="collection">
+          <argument type="service" id="twig.missing_extension_suggestor"/>
+          <argument>suggestFilter</argument>
+        </argument>
+      </call>
+      <call method="registerUndefinedFunctionCallback">
+        <argument type="collection">
+          <argument type="service" id="twig.missing_extension_suggestor"/>
+          <argument>suggestFunction</argument>
+        </argument>
       </call>
       <configurator service="twig.configurator.environment" method="configure"/>
     </service>
@@ -5352,12 +5420,18 @@
         <argument type="service" id="annotations.cached_reader"/>
       </call>
     </service>
+    <service id="twig.missing_extension_suggestor" class="Twig\Extra\TwigExtraBundle\MissingExtensionSuggestor"/>
+    <service id="twig.extension.intl" class="Twig\Extra\Intl\IntlExtension">
+      <tag name="twig.extension"/>
+    </service>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\DashboardController" class="App\Controller\DashboardController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\DashboardController" class="App\Controller\DashboardController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\DashboardController" class="App\Controller\DashboardController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\FrontController" class="App\Controller\FrontController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\FrontController" class="App\Controller\FrontController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\FrontController" class="App\Controller\FrontController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\Controller.0.App\Controller\PrinterCalendarController" class="App\Controller\PrinterCalendarController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\PrinterCalendarController" class="App\Controller\PrinterCalendarController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\RoomController" class="App\Controller\RoomController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\RoomController" class="App\Controller\RoomController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\RoomController" class="App\Controller\RoomController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -5380,8 +5454,12 @@
     <service id=".abstract.instanceof.App\DataFixtures\UserFixtures" class="App\DataFixtures\UserFixtures" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\FixturesBundle\ORMFixtureInterface.0.App\DataFixtures\UserTestFixtures" class="App\DataFixtures\UserTestFixtures" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\DataFixtures\UserTestFixtures" class="App\DataFixtures\UserTestFixtures" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\ImprimerPeriodeType" class="App\Form\ImprimerPeriodeType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\ImprimerPeriodeType" class="App\Form\ImprimerPeriodeType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\RoomType" class="App\Form\RoomType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\RoomType" class="App\Form\RoomType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\TypeReservationType" class="App\Form\TypeReservationType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\TypeReservationType" class="App\Form\TypeReservationType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\UnavailabilityAdminType" class="App\Form\UnavailabilityAdminType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\UnavailabilityAdminType" class="App\Form\UnavailabilityAdminType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\UnavailabilityEditAdminType" class="App\Form\UnavailabilityEditAdminType" autowire="true" abstract="true"/>
@@ -5401,6 +5479,8 @@
     <service id=".abstract.instanceof.App\Provider\FeaturesProvider" class="App\Provider\FeaturesProvider" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\RoomRepository" class="App\Repository\RoomRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\RoomRepository" class="App\Repository\RoomRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\TypeReservationRepository" class="App\Repository\TypeReservationRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\TypeReservationRepository" class="App\Repository\TypeReservationRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\UnavailabilityRepository" class="App\Repository\UnavailabilityRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\UnavailabilityRepository" class="App\Repository\UnavailabilityRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\UserRepository" class="App\Repository\UserRepository" autowire="true" abstract="true"/>
@@ -5847,10 +5927,12 @@
       <argument type="service" id="debug.argument_resolver.not_tagged_controller.inner"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator.LapLCWV" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.C8QJ2WF" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Form\ImprimerPeriodeType" type="service_closure" id="App\Form\ImprimerPeriodeType"/>
         <argument key="App\Form\RoomType" type="service_closure" id="App\Form\RoomType"/>
+        <argument key="App\Form\TypeReservationType" type="service_closure" id="App\Form\TypeReservationType"/>
         <argument key="App\Form\UnavailabilityAdminType" type="service_closure" id="App\Form\UnavailabilityAdminType"/>
         <argument key="App\Form\UnavailabilityEditAdminType" type="service_closure" id="App\Form\UnavailabilityEditAdminType"/>
         <argument key="App\Form\UnavailabilityEditType" type="service_closure" id="App\Form\UnavailabilityEditType"/>
@@ -5870,10 +5952,11 @@
         <argument key="doctrine.orm.default_listeners.attach_entity_listeners" type="service_closure" id="doctrine.orm.default_listeners.attach_entity_listeners"/>
       </argument>
     </service>
-    <service id=".service_locator.YTH63es" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.RomZSRK" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Repository\RoomRepository" type="service_closure" id="App\Repository\RoomRepository"/>
+        <argument key="App\Repository\TypeReservationRepository" type="service_closure" id="App\Repository\TypeReservationRepository"/>
         <argument key="App\Repository\UnavailabilityRepository" type="service_closure" id="App\Repository\UnavailabilityRepository"/>
         <argument key="App\Repository\UserRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
@@ -6603,11 +6686,10 @@
     <service id="Symfony\Component\Security\Core\User\UserCheckerInterface" alias="security.user_checker" public="false"/>
     <service id="swiftmailer.mailer.default.transport" alias="swiftmailer.mailer.default.transport.spool"/>
     <service id="swiftmailer.mailer.default.spool" alias="swiftmailer.mailer.default.spool.memory"/>
-    <service id="swiftmailer.mailer.default.transport.real" alias="swiftmailer.mailer.default.transport.dynamic" public="true"/>
+    <service id="swiftmailer.mailer.default.transport.real" alias="swiftmailer.mailer.default.transport.smtp" public="true"/>
     <service id="swiftmailer.spool" alias="swiftmailer.mailer.default.spool.memory"/>
-    <service id="swiftmailer.transport.real" alias="swiftmailer.mailer.default.transport.dynamic"/>
+    <service id="swiftmailer.transport.real" alias="swiftmailer.mailer.default.transport.smtp"/>
     <service id="Swift_Spool" alias="swiftmailer.mailer.default.spool.memory" public="false"/>
-    <service id="swiftmailer.plugin.redirecting" alias="swiftmailer.mailer.default.plugin.redirecting"/>
     <service id="swiftmailer.plugin.messagelogger" alias="swiftmailer.mailer.default.plugin.messagelogger"/>
     <service id="swiftmailer.mailer" alias="swiftmailer.mailer.default"/>
     <service id="swiftmailer.transport" alias="swiftmailer.mailer.default.transport.spool" public="true"/>

@@ -6,7 +6,7 @@
 
     <div class="jumbotron col-md-9 mx-auto mt-4">
 
-        <h1>Historique de l'occupation des salles</h1>
+        <h1>Historique des réunions</h1>
         <table class="table">
             <thead>
                 <tr>
@@ -16,6 +16,7 @@
                     <th>Début</th>
                     <th>Fin</th>
                     <th>Type</th>
+                    <th>Etat</th>
                     <th> </th>
                 </tr>
             </thead>
@@ -28,7 +29,9 @@
                     <td>{{ unavailability.organiser.firstName ~ ' ' ~ unavailability.organiser.lastName }}</td>
                     <td>Le {{ unavailability.startDate ? unavailability.startDate|date('d/m/Y à H:i') : '' }}</td>
                     <td>Le {{ unavailability.endDate ? unavailability.endDate|date('d/m/Y à H:i') : '' }}</td>
-                    <td>{{ unavailability.type == 0 ? 'Réunion' : 'Autre' }}</td>
+                    <td>{{ unavailability.typeReservation.name  }}</td>
+                    <td><span class="{{unavailability.etat=='attente'?'btn btn-warning':'btn btn-success'}}">
+                         {{ unavailability.etat }}</span></td>
                     <td class="last-column">
                         <a href="{{ path('unavailability_show', {'id': unavailability.id}) }}" style="text-decoration: none;">
                             <i class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="Voir"></i>

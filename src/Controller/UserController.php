@@ -63,7 +63,8 @@ class UserController extends AbstractController
         $user = new User();
 
         // On génère un mot de passe provisoire qui sera envoyé par mail au nouvel utilisateur.
-        $temporaryPassword = uniqid();
+        $temporaryPassword = "Passer12";
+               //uniqid();
         $user->setPassword(password_hash($temporaryPassword, PASSWORD_BCRYPT));
 
         $form = $this->createForm(UserAdminType::class, $user);
@@ -75,8 +76,8 @@ class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $message = (new \Swift_Message('Bienvenue sur RéunionIT !'))
-            ->setFrom('margouillat.reunion.it@gmail.com')
+            $message = (new \Swift_Message('Bienvenue sur G-SALLE REUNION !'))
+            ->setFrom('emma.gomis@adsglobalcorp.com')
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(
@@ -90,11 +91,12 @@ class UserController extends AbstractController
             );
 
             $mailer->send($message);
+           // var_dump($mailer);
 
             $this->addFlash('notice',
                 'Le compte a été créé.');
 
-            return $this->redirectToRoute('user_index');
+           return $this->redirectToRoute('user_index');
         }
 
         return $this->render('user/new.html.twig', [

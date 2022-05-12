@@ -1,0 +1,30 @@
+
+
+<div id="new_reserve" class="modal hide fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouveau type Réservation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    
+                </button>
+            </div>
+
+            {{ form_start(formType, {attr: {novalidate: 'novalidate'}}) }}
+
+                {{form_label(formType.name)}}
+                {{form_widget(formType.name)}}
+
+            <button class="btn btn-info" style="margin-top: 20px;" data-toggle="tooltip" data-placement="top" title="Enregistrer">
+                <i class="fas fa-check"></i>
+            </button>
+            {{ form_end(formType) }}
+
+                 
+           
+        </div>
+    </div>
+</div>
+
+

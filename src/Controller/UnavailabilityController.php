@@ -4,11 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Unavailability;
+use App\Entity\TypeReservation;
 use App\Entity\User;
 use App\Form\UnavailabilityAdminType;
 use App\Form\UnavailabilityEditAdminType;
 use App\Form\UnavailabilityEditType;
+use App\Form\TypeReservationType;
 use App\Form\UnavailabilityType;
+use App\Form\ImprimerPeriodeType;
+
 use App\Repository\RoomRepository;
 use App\Repository\UnavailabilityRepository;
 use App\Service\EmailManager;
@@ -81,15 +85,20 @@ class UnavailabilityController extends AbstractController
     {
         $unavailability = new Unavailability();
 
+        $typereservation = new TypeReservation();
+
         $unavailability->setOrganiser($this->getUser());
 
         if ($this->getUser()->hasRole('ROLE_ADMIN')) {
             $form = $this->createForm(UnavailabilityAdminType::class, $unavailability);
+            $formType = $this->createForm(TypeReservationType::class, $typereservation);
+
             // Comme le formulaire admin a un champ Organiser, on l'indique.
             $form->get('organiser')->setData($this->getUser());
         } else {
             $form = $this->createForm(UnavailabilityType::class, $unavailability);
-            $unavailability->setType(Unavailability::REUNION);
+            $formType = $this->createForm(TypeReservationType::class, $typereservation);
+          //  $unavailability->setTypeReservation("r");
         }
 
         // Pré-remplissage des dates et de la salle sélectionnées
@@ -114,6 +123,18 @@ class UnavailabilityController extends AbstractController
         }
 
         $form->handleRequest($request);
+        $formType->handleRequest($request);
+
+        if ($formType->isSubmitted() && $formType->isValid()) {
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($typereservation);
+            $entityManager->flush();
+
+            $formData = $form->getData();
+
+            return $this->redirect($request->getUri());
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
@@ -124,7 +145,7 @@ class UnavailabilityController extends AbstractController
 
             // Envoi de mail à l'organisateur
             $emailManager->sendEmail($mailer,
-                'ReunionIT | Enregistrement de votre réservation',
+                'Réservation Salle  | Enregistrement de votre réservation',
                 $formData->getOrganiser()->getEmail(),
                 'email/unavailability_new.html.twig',
                 ['data' => $formData]
@@ -134,7 +155,7 @@ class UnavailabilityController extends AbstractController
             $guests = $formData->getGuests();
             foreach ($guests as $guest) {
                 $emailManager->sendEmail($mailer,
-                    'ReunionIT | Nouvelle invitation',
+                    'Réservation Salle  | Nouvelle invitation',
                     $guest->getEmail(),
                     'email/unavailability_new_guest.html.twig',
                     ['guest'=>$guest,'data' => $formData]
@@ -152,6 +173,7 @@ class UnavailabilityController extends AbstractController
         return $this->render('unavailability/new.html.twig', [
             'unavailability' => $unavailability,
             'form' => $form->createView(),
+            'formType'=>$formType->createView()
 //            'unavailabilities' => $unavailabilities,
         ]);
     }
@@ -197,8 +219,12 @@ class UnavailabilityController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->getFilters()->disable('softdeleteable');
 
+        $typereservation = new TypeReservation();
+
         if ($this->getUser()->hasRole('ROLE_ADMIN')) {
             $form = $this->createForm(UnavailabilityEditAdminType::class, $unavailability);
+            $formType = $this->createForm(TypeReservationType::class, $typereservation);
+
         } else {
             $form = $this->createForm(UnavailabilityEditType::class, $unavailability);
         }
@@ -214,7 +240,7 @@ class UnavailabilityController extends AbstractController
 
             // Envoi de mail à l'organisateur
             $emailManager->sendEmail($mailer,
-                'ReunionIT | Modification de votre réservation',
+                'Réservation Salle  | Modification de votre réservation',
                 $formData->getOrganiser()->getEmail(),
                 'email/unavailability_edit.html.twig',
                 ['data' => $formData]
@@ -241,7 +267,7 @@ class UnavailabilityController extends AbstractController
             // Envoi de mails aux guests déjà invités
             foreach ($persistGuests as $guest) {
                 $emailManager->sendEmail($mailer,
-                    'ReunionIT | Modification d\'une invitation',
+                    'Réservation Salle  | Modification d\'une invitation',
                     $guest->getEmail(),
                     'email/unavailability_edit_guest.html.twig',
                     ['guest'=>$guest,'data' => $formData]
@@ -251,7 +277,7 @@ class UnavailabilityController extends AbstractController
             // Envoi de mails aux guests nouvellement invités
             foreach ($additionalGuests as $guest) {
                 $emailManager->sendEmail($mailer,
-                    'ReunionIT | Nouvelle invitation',
+                    'Réservation Salle  | Nouvelle invitation',
                     $guest->getEmail(),
                     'email/unavailability_new_guest.html.twig',
                     ['guest'=>$guest,'data' => $formData]
@@ -261,7 +287,7 @@ class UnavailabilityController extends AbstractController
             // Envoi de mails aux guests nouvellement invités
             foreach ($removedGuests as $guest) {
                 $emailManager->sendEmail($mailer,
-                    'ReunionIT | Invitation annulée',
+                    'Réservation Salle  | Invitation annulée',
                     $guest->getEmail(),
                     'email/unavailability_delete_guest.html.twig',
                     ['guest'=>$guest,'data' => $formData]
@@ -277,6 +303,7 @@ class UnavailabilityController extends AbstractController
         return $this->render('unavailability/edit.html.twig', [
             'unavailability' => $unavailability,
             'form' => $form->createView(),
+            'formType' => $formType->createView(),
         ]);
     }
 
@@ -304,7 +331,7 @@ class UnavailabilityController extends AbstractController
 
             // Envoi de mail à l'organisateur
             $emailManager->sendEmail($mailer,
-                'ReunionIT | Suppression de votre réservation',
+                'Réservation Salle | Suppression de votre réservation',
                 $unavailability->getOrganiser()->getEmail(),
                 'email/unavailability_delete.html.twig',
                 ['data' => $unavailability]
@@ -314,7 +341,7 @@ class UnavailabilityController extends AbstractController
             $guests = $unavailability->getGuests();
             foreach ($guests as $guest) {
                 $emailManager->sendEmail($mailer,
-                    'ReunionIT | Annulation d\'une invitation',
+                    'Réservation Salle  | Annulation d\'une invitation',
                     $guest->getEmail(),
                     'email/unavailability_delete_guest.html.twig',
                     ['guest'=>$guest,'data' => $unavailability]
@@ -337,7 +364,9 @@ class UnavailabilityController extends AbstractController
      */
     public function calendar()
     {
-        return $this->render('unavailability/calendar.html.twig');
+        $formImprimer = $this->createForm(ImprimerPeriodeType::class, null);
+
+        return $this->render('unavailability/calendar.html.twig',["form_imprimer"=>$formImprimer->createView()]);
     }
 
 
@@ -351,11 +380,53 @@ class UnavailabilityController extends AbstractController
     public function sendEmail(Swift_Mailer $mailer, $object, $to, $view, $options)
     {
         $message = (new \Swift_Message($object))
-            ->setFrom('bassmpci@gmail.com')
+            ->setFrom('emma.gomis@adsglobalcorp.com')
             ->setTo($to)
             ->setBody(
                 $this->renderView($view, $options), 'text/html');
         $mailer->send($message);
+    }
+
+     /**
+     * Permet de créer une nouvelle réservation.
+     * @Route("/nouvelle-type-reservation.html", name="type_reservation_new", methods={"GET","POST"})
+     * @IsGranted("ROLE_EMPLOYEE", message="Vous n'êtes pas autorisé à consulter cette page.")
+     * @param Request $request
+     * @return Response
+     */
+    public function newTypeReservation(Request $request): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $queryBuilder = $entityManager->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->orderBy('u.lastName', 'ASC');
+
+        $adapter = new DoctrineORMAdapter($queryBuilder);
+
+        $pagerfanta = new Pagerfanta($adapter);
+
+
+        $typereservation = new TypeReservation();
+        $form = $this->createForm(TypeReservationType::class, $typereservation);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($typereservation);
+            $entityManager->flush();
+
+            $formData = $form->getData();
+
+            return $this->redirectToRoute('unavailability_calendar');
+        }
+
+        return $this->render('unavailability/new_type_reservation.html.twig', [
+            'formType' => $form->createView(),
+        ]);
+        
     }
 
 }

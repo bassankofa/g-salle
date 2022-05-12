@@ -5,6 +5,8 @@ namespace App\Form;
 
 use App\Entity\Room;
 use App\Entity\Unavailability;
+use App\Entity\TypeReservation;
+
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -16,6 +18,7 @@ class UnavailabilityAdminType extends UnavailabilityType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $users = $this->userRepository->findActiveUsers();
+        $typereservations = $this->typereservationRepository->findAllType();
 
         parent::buildForm($builder, $options);
 
@@ -25,7 +28,7 @@ class UnavailabilityAdminType extends UnavailabilityType
                 'class' => Room::class,
                 'choice_label' => 'name'
             ])
-            ->add('type', ChoiceType::class, [
+            /*->add('type', ChoiceType::class, [
                 'label' => 'Type de réservation',
                 'choices' => [
                     'Réunion' => Unavailability::REUNION,
@@ -33,6 +36,14 @@ class UnavailabilityAdminType extends UnavailabilityType
                 ],
                 'expanded' => false,
                 'multiple' => false
+            ])*/
+            ->add('type_reservation', EntityType::class, [
+                'label' => 'Type de réservation ' ,
+                'class' => TypeReservation::class,
+                'choices' => $typereservations,
+                'choice_label' => function(TypeReservation $typereservation) {return $typereservation->getName();},
+                'expanded' => false,
+                'multiple' => false,
             ])
             ->add('organiser', EntityType::class, [
                 'label' => 'Organisateur',
@@ -44,3 +55,41 @@ class UnavailabilityAdminType extends UnavailabilityType
             ]);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

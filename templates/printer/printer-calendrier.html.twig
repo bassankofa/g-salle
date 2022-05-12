@@ -1,0 +1,118 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+
+    <link rel="icon" href="{{ asset('images/gecko.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" />
+    <link rel="stylesheet" href="{{ asset('css/reunionit-custom.css') }}" />
+    <style>
+    body{
+        font-family: sans-serif;
+    }
+    .title{
+        text-align:center;
+        font-size:30px;
+        margin-top:3%;
+        margin-bottom:3%;
+    }
+    .logo{
+        width:20%;
+    }
+      table{
+         border-collapse: collapse;
+         width:100%;
+         
+    }
+
+        th, td{
+        border: 1px solid black;
+
+        
+        }
+          th{
+        padding:10px;
+        text-transform : uppercase;
+        
+        }
+        
+        
+        .separateur{
+            background:#0AAA00;
+            height:110px;
+            width:100%;
+            padding-top:111px;
+        }
+        .vide{
+            font-size: 36px;
+            color: #eee;
+            text-align: center;
+            padding-top: 10px;
+        }
+    </style>
+{% endblock %}
+      
+{% block body %}
+          <img class="logo" src="http://localhost/reunionIT/public/images/logo.png" alt="logo ads" />
+        <div class="title">{{ title }}
+                     <br/>{{ semaine }}
+        </div>
+
+
+        {% if unavailabilities_pager == null %}
+           <div class="vide"> calendrier Vide </div>
+        {% else %}
+                    {# ./templates/printer/printer-calendrier.html.twig #}
+
+
+
+
+            <table class="table">
+            <thead>
+            <tr>
+                    <th class="header">Jour</th>
+                    <th>Heure</th>
+                    <th>entite</th>
+                    <th>responsable/demandeur</th>
+                    <th>Objet</th>
+                    <th>participants</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+                {% for unavailability in unavailabilities_pager %}
+                    <tr>
+                    <td style="text-transform:uppercase"> 
+                         {{ unavailability.start_date  ? unavailability.start_date  |format_datetime(locale='fr',pattern="EEEE") }}
+
+                     </td>
+                    <td>{{unavailability.start_date ? unavailability.start_date|date('H:i') : ''}}</td>
+                    <td>  {{unavailability.entite}}</td>
+                    <td> {{unavailability.orga_firstname}}</td>
+                    <td> {{unavailability.object}}</td>
+                    <td> {{unavailability.guest}}</td>
+                    </tr>
+                    {% endfor %}
+                   
+                
+            
+
+            </tbody>
+
+            </table>
+            
+
+        {% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+{% endblock %}

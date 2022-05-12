@@ -8,12 +8,15 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
+        '/printer-data.html' => [[['_route' => 'imprimer-data', '_controller' => 'App\\Controller\\PrinterCalendarController::getData'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/printer-calendrier.html' => [[['_route' => 'imprimer-calendrier', '_controller' => 'App\\Controller\\PrinterCalendarController::index'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/liste-des-salles.html' => [[['_route' => 'room_index', '_controller' => 'App\\Controller\\RoomController::index'], null, ['GET' => 0], null, false, false, null]],
         '/admin/nouvelle-salle.html' => [[['_route' => 'room_new', '_controller' => 'App\\Controller\\RoomController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/connexion' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, null, null, false, false, null]],
         '/admin/historique.html' => [[['_route' => 'unavailability_index', '_controller' => 'App\\Controller\\UnavailabilityController::index'], null, ['GET' => 0], null, false, false, null]],
         '/nouvelle-reservation.html' => [[['_route' => 'unavailability_new', '_controller' => 'App\\Controller\\UnavailabilityController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/calendrier.html' => [[['_route' => 'unavailability_calendar', '_controller' => 'App\\Controller\\UnavailabilityController::calendar'], null, null, null, false, false, null]],
+        '/nouvelle-type-reservation.html' => [[['_route' => 'type_reservation_new', '_controller' => 'App\\Controller\\UnavailabilityController::newTypeReservation'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/admin/utilisateurs.html' => [[['_route' => 'user_index', '_controller' => 'App\\Controller\\UserController::index'], null, ['GET' => 0], null, false, false, null]],
         '/admin/nouvel-utilisateur.html' => [[['_route' => 'user_new', '_controller' => 'App\\Controller\\UserController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/mot-de-passe.html' => [[['_route' => 'password_change', '_controller' => 'App\\Controller\\UserController::changePassword'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],

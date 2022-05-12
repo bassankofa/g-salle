@@ -31,7 +31,7 @@ class EmailManager
     public function sendEmail(Swift_Mailer $mailer, $object, $to, $view, $options)
     {
         $message = (new \Swift_Message($object))
-            ->setFrom('margouillat.reunion.it@gmail.com')
+            ->setFrom('emma.gomis@adsglobalcorp.com')
             ->setTo($to)
             ->setBody($this->twig->render($view, $options), 'text/html');
         $mailer->send($message);

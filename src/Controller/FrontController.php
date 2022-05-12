@@ -31,6 +31,8 @@ class FrontController extends AbstractController
         $fakeUser->setFirstName('-');
         $fakeUser->setLastName('-');
 
+
+        
         $totalRoomCount = count($roomRepository->findAll());
         $upcomingUnavailabilitiesCount = count($unavailabilityRepository->findUpcomingUnavailabilities())   ?? 0;
         $roomMaxCapacity = $roomRepository->findMaxCapacityRoom()                                           ?? 0;

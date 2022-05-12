@@ -16,7 +16,9 @@ use App\Validator\Availability as UnavailabilityAssert;
 class Unavailability
 {
     const   REUNION = 0,
-            AUTRE = 1;
+            AUTRE = 1,
+            ATTENTE="",
+            VALIDER="";
 
     const   DAY_START = '08:00',
             DAY_END = '20:00';
@@ -46,11 +48,22 @@ class Unavailability
      */
     private $object;
 
-    /**
-     * @ORM\Column(type="integer")
-     * @Assert\NotNull()
+     /**
+     * @ORM\Column(type="string", length=80)
+     * @Assert\NotBlank(message="Vous devez saisir un l'entité")
+     * @Assert\Length(max="80", maxMessage="L'entité de la réunion ne doit pas dépasser {{ limit }} caractères.")
      */
-    private $type;
+    private $entite;
+    /**
+     * @ORM\Column(type="string", length=80)
+     */
+    private $etat;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\TypeReservation", inversedBy="unavailabilities")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $type_reservation;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="unavailabilities")
@@ -115,15 +128,36 @@ class Unavailability
 
         return $this;
     }
-
-    public function getType(): ?int
+    public function getEntite(): ?string
     {
-        return $this->type;
+        return $this->entite;
     }
 
-    public function setType(int $type): self
+    public function setEntite(string $entite): self
     {
-        $this->type = $type;
+        $this->entite = $entite;
+
+        return $this;
+    }
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+    public function getTypeReservation(): ?TypeReservation
+    {
+        return $this->type_reservation;
+    }
+
+    public function setTypeReservation(?TypeReservation $type_reservation): self
+    {
+        $this->type_reservation = $type_reservation;
 
         return $this;
     }

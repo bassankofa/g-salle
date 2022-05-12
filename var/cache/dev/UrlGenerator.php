@@ -5,6 +5,8 @@
 return [
     'unavailability_as_organiser' => [['page'], ['_controller' => 'App\\Controller\\DashboardController::showUnavailabilitiesAsOrganiser'], [], [['variable', '/', '[^/]++', 'page', true], ['text', '/pagers/unavailabilitiesasorganiser']], [], []],
     'unavailability_as_guest' => [['page'], ['_controller' => 'App\\Controller\\DashboardController::showUnavailabilitiesAsGuest'], [], [['variable', '/', '[^/]++', 'page', true], ['text', '/pagers/unavailabilitiesasguest']], [], []],
+    'imprimer-data' => [[], ['_controller' => 'App\\Controller\\PrinterCalendarController::getData'], [], [['text', '/printer-data.html']], [], []],
+    'imprimer-calendrier' => [[], ['_controller' => 'App\\Controller\\PrinterCalendarController::index'], [], [['text', '/printer-calendrier.html']], [], []],
     'room_index' => [[], ['_controller' => 'App\\Controller\\RoomController::index'], [], [['text', '/liste-des-salles.html']], [], []],
     'room_new' => [[], ['_controller' => 'App\\Controller\\RoomController::new'], [], [['text', '/admin/nouvelle-salle.html']], [], []],
     'room_show' => [['id'], ['_controller' => 'App\\Controller\\RoomController::show'], [], [['text', '.html'], ['variable', '-', '[^/\\.]++', 'id', true], ['text', '/salle']], [], []],
@@ -17,6 +19,7 @@ return [
     'unavailability_edit' => [['id'], ['_controller' => 'App\\Controller\\UnavailabilityController::edit'], [], [['text', '.html'], ['variable', '-', '[^/\\.]++', 'id', true], ['text', '/modifier/reservation']], [], []],
     'unavailability_delete' => [['id'], ['_controller' => 'App\\Controller\\UnavailabilityController::delete'], [], [['text', '.html'], ['variable', '-', '[^/\\.]++', 'id', true], ['text', '/supprimer/reservation']], [], []],
     'unavailability_calendar' => [[], ['_controller' => 'App\\Controller\\UnavailabilityController::calendar'], [], [['text', '/calendrier.html']], [], []],
+    'type_reservation_new' => [[], ['_controller' => 'App\\Controller\\UnavailabilityController::newTypeReservation'], [], [['text', '/nouvelle-type-reservation.html']], [], []],
     'user_index' => [[], ['_controller' => 'App\\Controller\\UserController::index'], [], [['text', '/admin/utilisateurs.html']], [], []],
     'user_new' => [[], ['_controller' => 'App\\Controller\\UserController::new'], [], [['text', '/admin/nouvel-utilisateur.html']], [], []],
     'user_show' => [['id'], ['_controller' => 'App\\Controller\\UserController::show'], [], [['text', '.html'], ['variable', '-', '[^/\\.]++', 'id', true], ['text', '/utilisateur']], [], []],

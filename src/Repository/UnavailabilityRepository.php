@@ -53,6 +53,7 @@ class UnavailabilityRepository extends ServiceEntityRepository
     public function findAllAndOrder()
     {
         return $this->createQueryBuilder('u')
+            
             ->orderBy('u.startDate', 'DESC')
             ->getQuery()
             ->getResult();
@@ -101,6 +102,8 @@ class UnavailabilityRepository extends ServiceEntityRepository
             ->where('u.startDate BETWEEN :startDate and :endDate')
             ->setParameter('startDate', $startDate->format('Y-m-d H:i:s'))
             ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'))
+            ->andWhere('u.etat = :etat')
+            ->setParameter('etat', 'valider')
             ->getQuery()
             ->getResult();
     }

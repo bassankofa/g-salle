@@ -63,6 +63,11 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Entité</th>
+                    <td>{{ unavailability.entite }}</td>
+              
+                </tr>
+                <tr>
                     <th>Salle</th>
                     <td>
                         {# On désactive le lien vers la salle si elle n'existe plus #}
@@ -100,10 +105,16 @@
                         {% endfor %}
                     </td>
                 </tr>
+                 <tr>
+                    <th>Etat</th>
+                    <td><span class="{{unavailability.etat=='attente'?'btn btn-warning':'btn btn-success'}}">
+                          {{ unavailability.etat }}</span></td>
+              
+                </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                     <tr>
                         <th>Type</th>
-                        <td>{{ unavailability.type == 0 ? 'Réunion' : 'Autre' }}</td>
+                        <td>{{ unavailability.typeReservation.name }}</td>
                     </tr>
                 {% endif %}
             </tbody>

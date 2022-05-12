@@ -1,8 +1,12 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-
+    
     <div class="jumbotron col-md-9 mx-auto mt-5">
+
+        
+        <div> <button type="button" class="btn" data-toggle="modal" data-target="#form-imprimer"><i class="fa fa-print"></i> </button></div>
+
 
         {% for message in app.flashes('notice') %}
             <div class="mb-4 py-2 reunionit-addflash">
@@ -13,6 +17,33 @@
         {% include '@FullCalendar/Calendar/calendar.html.twig' %}
 
     </div>
+     
+<div id="form-imprimer" class="modal hide fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Imprimer période</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    
+                </button>
+            </div>
+            {{ form_start(form_imprimer, {attr: {novalidate: 'novalidate'}}) }}
+
+            {{form_widget(form_imprimer)}}
+
+            <div class="printer">
+      
+                <button type="button" class="btn btn-primary" id="btn-imprimer"><i class="fa fa-print"> </i>Imprimer</button>
+            </div>
+           {{ form_end(form_imprimer)}}
+                 
+           
+        </div>
+    </div>
+</div>
+
+
 
 {% endblock %}
 
@@ -37,6 +68,9 @@
     <script src='{{ asset('bundles/fullcalendar/js/fullcalendar/locale/fr.js') }}'></script>
 
     <script type="text/javascript">
+     function printer(){
+        window.print()
+     }
         $(function () {
             $('#calendar-holder').fullCalendar({
                 locale: 'fr',
@@ -73,5 +107,43 @@
                 ]
             });
         });
+    </script>
+
+     <script>
+
+var date_debut;
+var date_fin;
+
+function dateDebut(val){
+    date_debut=val;
+}
+
+function dateFin(val){
+    date_fin=val;
+
+}
+        $('#btn-imprimer').on("click", function() {
+          
+
+            $.ajax({
+                 method: 'POST',
+                 url: "{{ path('imprimer-data')}}",
+                 data: {date_debut:date_debut,date_fin :date_fin},
+                 success: function(data,dataType,d){
+
+                    window.open('printer-calendrier.html?data='+JSON.stringify(data)+"&date_debut="+date_debut+"&date_fin="+date_fin, '_blank');
+
+
+
+                    //$(code_html).appendTo('#modal_form');
+                  //  $('#imprimer').modal('show');
+                },
+                error:function(error){
+
+                    console.log("error print");
+                }
+            })
+        });
+
     </script>
 {% endblock %}
